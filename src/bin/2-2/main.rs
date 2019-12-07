@@ -1,14 +1,25 @@
 fn main() {
-    let mut s = include_str!("input")
+    let s = include_str!("input")
         .split(',')
         .map(|l| l.trim())
         .filter(|l| !l.is_empty())
         .map(|l| l.parse().unwrap())
         .collect::<Vec<usize>>();
 
-    s[1] = 12;
-    s[2] = 2;
+    for noun in 0..100 {
+        for verb in 0..100 {
+            let mut s = s.clone();
+            s[1] = noun;
+            s[2] = verb;
+            interpret(&mut s);
+            if 19690720 == s[0] {
+                println!("{}", 100 * noun + verb);
+            }
+        }
+    }
+}
 
+fn interpret(s: &mut [usize]) {
     let mut p = 0usize;
     loop {
         match s[p] {
@@ -29,6 +40,4 @@ fn main() {
             other => unreachable!("bad opcode: {}", other),
         }
     }
-
-    println!("{}", s[0]);
 }
