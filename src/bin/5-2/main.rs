@@ -45,7 +45,7 @@ fn interpret(mut inputs: Vec<i64>, s: &mut [i64]) -> Vec<i64> {
             }
 
             3 => {
-                let dest = addr(s[p + 3]);
+                let dest = addr(s[p + 1]);
                 s[dest] = inputs.remove(0);
                 p += 2;
             }
