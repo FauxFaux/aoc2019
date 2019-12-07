@@ -11,15 +11,19 @@ fn main() {
     println!("{:?}", interpret(vec![5], &mut s));
 }
 
-fn param(s: &[i64], p: usize, n: usize) -> i64 {
+fn param_ptr(s: &[i64], p: usize, n: usize) -> usize {
     let op = s[p];
     assert!(op > 0);
     let mode = op / 10i64.pow((n + 1) as u32) % 10;
     match mode {
-        0 => s[addr(s[p + n])],
-        1 => s[p + n],
+        0 => addr(s[p + n]),
+        1 => p + n,
         _ => unreachable!("bad opcode: {}", s[p]),
     }
+}
+
+fn param(s: &[i64], p: usize, n: usize) -> i64 {
+    s[param_ptr(s, p, n)]
 }
 
 fn addr(val: i64) -> usize {
@@ -33,19 +37,19 @@ fn interpret(mut inputs: Vec<i64>, s: &mut [i64]) -> Vec<i64> {
         let ins = s[p];
         match ins % 100 {
             1 => {
-                let dest = addr(s[p + 3]);
+                let dest = param_ptr(s, p, 3);
                 s[dest] = param(s, p, 1) + param(s, p, 2);
                 p += 4;
             }
 
             2 => {
-                let dest = addr(s[p + 3]);
+                let dest = param_ptr(s, p, 3);
                 s[dest] = param(s, p, 1) * param(s, p, 2);
                 p += 4;
             }
 
             3 => {
-                let dest = addr(s[p + 1]);
+                let dest = param_ptr(s, p, 1);
                 s[dest] = inputs.remove(0);
                 p += 2;
             }
@@ -72,7 +76,7 @@ fn interpret(mut inputs: Vec<i64>, s: &mut [i64]) -> Vec<i64> {
             }
 
             7 => {
-                let dest = addr(param(s, p, 3));
+                let dest = param_ptr(s, p, 3);
                 s[dest] = if param(s, p, 1) < param(s, p, 2) {
                     1
                 } else {
@@ -82,7 +86,7 @@ fn interpret(mut inputs: Vec<i64>, s: &mut [i64]) -> Vec<i64> {
             }
 
             8 => {
-                let dest = addr(param(s, p, 3));
+                let dest = param_ptr(s, p, 3);
                 s[dest] = if param(s, p, 1) == param(s, p, 2) {
                     1
                 } else {
