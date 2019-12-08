@@ -2,7 +2,7 @@ use itertools::Itertools;
 use std::convert::TryFrom;
 
 fn main() {
-    let mut s = include_str!("input")
+    let s = include_str!("input")
         .split(',')
         .map(|l| l.trim())
         .filter(|l| !l.is_empty())
