@@ -5,8 +5,8 @@ fn main() {
         .split('\n')
         .map(|l| l.trim())
         .filter(|l| !l.is_empty())
-        .map(|l| l.trim().split_at(3))
-        .map(|(a, b)| (a, &b[1..]))
+        .map(|l| l.split_at(l.find(")").unwrap()))
+        .map(|(a, b)| (&b[1..], a))
         .collect();
 
     let a = a
@@ -15,11 +15,11 @@ fn main() {
             let mut i = 0;
 
             loop {
+                i += 1;
                 v = match a.get(v) {
                     Some(v) => v,
                     None => break i,
                 };
-                i += 1;
             }
         })
         .sum::<u64>();
