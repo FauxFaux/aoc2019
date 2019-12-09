@@ -10,7 +10,7 @@ fn main() {
 
     s.extend(vec![0; 10_000]);
 
-    let a = interpret(vec![1], &mut s, &mut 0, &mut 0)[0];
+    let a = interpret(vec![2], &mut s, &mut 0, &mut 0)[0];
 
     println!("{:?}", a);
 }
@@ -22,9 +22,7 @@ fn param_ptr(s: &[i64], p: usize, n: usize, b: i64) -> usize {
     match mode {
         0 => addr(s[p + n]),
         1 => p + n,
-        2 => {
-            addr(s[p + n] + b)
-        },
+        2 => addr(s[p + n] + b),
         _ => unreachable!("bad opcode: {}", s[p]),
     }
 }
