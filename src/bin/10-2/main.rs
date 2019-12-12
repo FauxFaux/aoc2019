@@ -1,5 +1,8 @@
 use std::convert::TryFrom;
 
+use itertools::Itertools;
+use noisy_float::prelude::*;
+
 fn main() {
     let mut m: Vec<Vec<bool>> = include_str!("input")
         .split('\n')
@@ -13,32 +16,60 @@ fn main() {
 
     let x = 30;
     let y = 34;
-
-    let a = perms(i64(w + 1))
+    let mut d: Vec<_> = perms(i64(w + 1))
         .into_iter()
         .skip(1)
         .flat_map(|(dx, dy)| vec![(dx, dy), (-dx, dy), (dx, -dy), (-dx, -dy)])
-        .filter(|&(dx, dy)| {
+        .sorted()
+        .unique()
+        .map(|(dx, dy)| (r32((dy as f32).atan2(dx as f32)), (dx, dy)))
+        .sorted_by_key(|&(a, (dx, dy))| (a, -dx * dx - dy * dy))
+        .collect();
+
+    // BORROW CHECKER
+
+    // I'm worried this is my best programming joke of the year.
+    let pi = d.len();
+    d.rotate_right(pi / 4);
+
+    d.reverse();
+
+    println!("{:?}", d);
+
+    let mut last = R32::default();
+
+    let a = d
+        .into_iter()
+        .cycle()
+        .filter(|&(a, (dx, dy))| {
+            if last == a {
+                return false;
+            }
+            last = a;
             let mut ax = x;
             let mut ay = y;
-
-            let mut hit = false;
 
             loop {
                 ax += dx;
                 ay += dy;
                 if ax < 0 || ay < 0 || ax >= i64(w) || ay >= i64(h) {
-                    break;
+                    return false;
                 }
 
                 let here = &mut m[usize(ay)][usize(ax)];
-                hit |= *here;
+                if *here {
+                    *here = false;
+                    return true;
+                }
                 *here = false;
             }
 
-            hit
+            false
         })
-        .count();
+        .enumerate()
+        .inspect(|&(n, (a, (dx, dy)))| println!("{}: {},{} {:?}", n, x + dx, y + dy, (dx, dy)))
+        .nth(200)
+        .map(|(_, (_, (dx, dy)))| (x + dx) * 100 + (y + dy));
 
     println!("{:?}", a);
 }
