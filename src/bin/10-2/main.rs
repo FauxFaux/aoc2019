@@ -23,16 +23,14 @@ fn main() {
         .sorted()
         .unique()
         .map(|(dx, dy)| (r32((dy as f32).atan2(dx as f32)), (dx, dy)))
-        .sorted_by_key(|&(a, (dx, dy))| (a, -dx * dx - dy * dy))
+        .sorted_by_key(|&(a, (dx, dy))| (a, dx * dx + dy * dy))
         .collect();
 
     // BORROW CHECKER
 
     // I'm worried this is my best programming joke of the year.
     let pi = d.len();
-    d.rotate_right(pi / 4);
-
-    d.reverse();
+    d.rotate_left(pi / 4 - w);
 
     println!("{:?}", d);
 
@@ -63,12 +61,10 @@ fn main() {
                 }
                 *here = false;
             }
-
-            false
         })
         .enumerate()
-        .inspect(|&(n, (a, (dx, dy)))| println!("{}: {},{} {:?}", n, x + dx, y + dy, (dx, dy)))
-        .nth(200)
+        .inspect(|&(n, (_a, (dx, dy)))| println!("{}: {},{} {:?}", n, x + dx, y + dy, (dx, dy)))
+        .nth(199)
         .map(|(_, (_, (dx, dy)))| (x + dx) * 100 + (y + dy));
 
     println!("{:?}", a);
